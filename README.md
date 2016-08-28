@@ -15,6 +15,7 @@ The verdict thus far: funky, but operational. More specific notes:
 * Force graphs don't work at all. Unclear why.
 * The visualizations won't load on page load because you won't have the proper D3 CDN localized until you actually run the cell.
 * D3 cells generated via `Run All` will almost always fail and raise a `Maximum Recursion Error`. I think this is because `%%d3` display cells (implemented via `IPython.display.display`) just initialize the JavaScript code and move on, and don't wait for any necessary D3 libraries to download via CDN. By the time D3 is ready, your notebook might be done running! Running the cells individually, one-by-one, works every time. Usually.
+* Right now I patch all `d3.select` and `d3.selectAll` calls in the entire notebook every time that a new cell is run to target that new cell. This is fine if all `d3` calls have ended by then (e.g. the visualization is static), but will error out or cause undefined behavior if can still be made out of other cells (e.g. the visualization is interactive). I can probably patch this by overwriting on a per-cell basis with a factory method, will give it a shot.
 * This has only been implemented for the 3.0 branch of D3.JS so far, a 4.0 version is coming.
 
 See [this comment by Mike Bostock](https://github.com/d3/d3/issues/2947) for ideation.
