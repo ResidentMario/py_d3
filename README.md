@@ -5,7 +5,9 @@ The core file in this repository is `py-d3.py`, an IPython extension meant for a
 
 The problem this addresses, in brief: Jupyter notebooks allow executing arbitrary JavaScript code using `IPython.display.JavaScript`, however it makes no effort to restrict the level of DOM objects accessible to executable code. Thus if you ran, for instance, `%javascript d3.selectAll("div").remove();`, you would target and remove *all* `div` elements on the page, including the ones making up the notebook itself!
 
-This plugin attempts to improve on a few existing Jupyter-D3 bindings by restricting `d3` scope to whatever cell you are running the code in. It achieves this by monkey-patching subselection over the core `d3.select` and `d3.selectAll` methods.
+This plugin attempts to improve on a few existing Jupyter-D3 bindings by restricting `d3` scope to whatever cell you are running the code in. It achieves this by monkey-patching subselection over the core `d3.select` and `d3.selectAll` methods. Declare `%%d3` at the beginning of a cell and you're ready to roll!
+
+I also want to implement a `%%block` line magic as a [bl.ocks](http://bl.ocks.org/) interface because that'd allow more elegant one-liner chart embedding.
 
 The verdict thus far: funky, but operational. More specific notes:
 
