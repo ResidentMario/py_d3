@@ -24,7 +24,8 @@ class D3Magics(Magics):
     @cell_magic
     def d3(self, line, cell):
         src = line if line else "3.5.17"
-        s = """
+        if src[0] == "3":
+            s = """
 <script src="//cdnjs.cloudflare.com/ajax/libs/d3/""" + src + """/d3.js"></script>
 
 <script>
@@ -38,7 +39,9 @@ d3.selectAll = function(selection) {
 }
 </script>
 <g id="d3-cell-""" + str(self.max_id) + """">
-"""
+    """
+        else:
+            s = """"""  # TODO: Implement for D3 v. 4.#.#.
         s += cell + "\n</g>"
         h = HTML(s)
         self.max_id += 1
