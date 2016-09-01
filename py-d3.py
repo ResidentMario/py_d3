@@ -5,6 +5,7 @@ from __future__ import print_function
 from IPython.core.magic import (Magics, magics_class, line_magic,
                                 cell_magic)  # , line_cell_magic)
 from IPython.display import HTML, display
+import re
 
 
 # The class MUST call this class decorator at creation time
@@ -31,10 +32,10 @@ class D3Magics(Magics):
 <script>
 _select = d3.select;
 
-d3.select = function(selection) {
+d3.select""" + str(self.max_id) + """ = function(selection) {
     return _select("#d3-cell-""" + str(self.max_id) + """").select(selection);
 }
-d3.selectAll = function(selection) {
+d3.selectAll""" + str(self.max_id) + """ = function(selection) {
     return _select("#d3-cell-""" + str(self.max_id) + """").selectAll(selection);
 }
 </script>
@@ -42,7 +43,16 @@ d3.selectAll = function(selection) {
     """
         else:
             s = """"""  # TODO: Implement for D3 v. 4.#.#.
+        # for start_ind, end_ind in [m.span() for m in re.finditer('d3.select\((?!this)', cell)]:
+        #     print(cell[start_ind:end_ind])
+        #     fragment = "d3.select" + str(self.max_id) + "("
+        #     print("Fragment: " + fragment)
+        #     cell = cell[:start_ind] + fragment + cell[end_ind + 1:]
+        # cell = cell.replace("d3.select(", "d3.select" + str(self.max_id) + "(")
+        # cell = cell.replace("d3.selectAll(", "d3.selectAll" + str(self.max_id) + "(")
+        cell = re.sub('d3.select\((?!this)', "d3.select" + str(self.max_id) + "(", cell)
         s += cell + "\n</g>"
+        print(s)
         h = HTML(s)
         self.max_id += 1
         display(h)
