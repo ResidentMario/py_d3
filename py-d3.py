@@ -3,7 +3,7 @@
 # doesn't instantiate it yet.
 from __future__ import print_function
 from IPython.core.magic import (Magics, magics_class, line_magic,
-                                cell_magic)  # , line_cell_magic)
+                                cell_magic)
 from IPython.display import HTML, display
 import re
 # import requests
@@ -20,8 +20,8 @@ class D3Magics(Magics):
         self.max_id = 0  # Used to ensure that the current group selection is unique.
         # self.initialized = True  # Used to ensure that d3.js is only imported once.
 
-    # Unfortunately there isn't an easy way to perform the substitutions necessary to modify a frame-independent
-    # block to work within a Jupyter Notebook, so this idea is sandboxed.
+    # # The necessary substitutions to get a block working are theoretically possible, but too quirky for the moment
+    # to consider.
     # @line_magic
     # def block(self, line):
     #     user, gist_id = line.split("/")[-2:]
@@ -42,10 +42,11 @@ class D3Magics(Magics):
     #     #    >>> d3.select("body")      -->     d3.select("g")
     #     #    >>> <body id="foo">        -->     ???
     #     #    >>> <body class="foo">     -->     ???
-    #     source = source.replace('<body', '<g id="content"')
-    #     source = source.replace("select('body", "select(#content")
-    #     source = source.replace('select("body', 'select(#content')
-    #     display((user, gist_id, source))
+    #     source = source.replace('<body', '<g')
+    #     source = source.replace("select('body", "select(g")
+    #     source = source.replace('d3.tsv("', 'd3.tsv("./.blocks/{0}/{1}-master/'.format(user, gist_id))
+    #     print(HTML(source).data)
+    #     display(HTML(source))
 
     @cell_magic
     def d3(self, line, cell):
