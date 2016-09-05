@@ -6,6 +6,9 @@ from IPython.core.magic import (Magics, magics_class, line_magic,
                                 cell_magic)  # , line_cell_magic)
 from IPython.display import HTML, display
 import re
+# import requests
+# import zipfile
+# import io
 
 
 # The class MUST call this class decorator at creation time
@@ -17,16 +20,37 @@ class D3Magics(Magics):
         self.max_id = 0  # Used to ensure that the current group selection is unique.
         # self.initialized = True  # Used to ensure that d3.js is only imported once.
 
-    @line_magic
-    def block(self, line):
-        user, gist_id = line.split("/")[-2:]
-        # TODO: The rest.
+    # Unfortunately there isn't an easy way to perform the substitutions necessary to modify a frame-independent
+    # block to work within a Jupyter Notebook, so this idea is sandboxed.
+    # @line_magic
+    # def block(self, line):
+    #     user, gist_id = line.split("/")[-2:]
+    #     r = requests.get("https://gist.github.com/{0}/{1}/download".format(user, gist_id))
+    #     with zipfile.ZipFile(io.BytesIO(r.content)) as ar:
+    #         ar.extractall(".blocks/{0}/".format(user, gist_id))
+    #         # This creates e.g. ".blocks/mbostock/3885304-master" in the root directory.
+    #         # The appended "-master" is due to the format of the zipped file.
+    #         # It's a little unideal, but unsure about whether or not removing it would cause any issues I've kept it
+    #         # for the time being (you could easily rename the folder).
+    #     with open(".blocks/{0}/{1}-master/index.html".format(user, gist_id), "r") as f:
+    #         source = f.read()
+    #     # We need to perform a few substutions to make the figure work within a Jupyter Notebook file.
+    #     # 1. <body> tags are not allowed within a D3 notebook (one has already been defined and HTML documents only
+    #     #    allow one <body> and one <head>), but are probably the most common initial selector of all for defining the
+    #     #    initial D3 frame. To fix:
+    #     #    >>> <body>                 -->     <g>
+    #     #    >>> d3.select("body")      -->     d3.select("g")
+    #     #    >>> <body id="foo">        -->     ???
+    #     #    >>> <body class="foo">     -->     ???
+    #     source = source.replace('<body', '<g id="content"')
+    #     source = source.replace("select('body", "select(#content")
+    #     source = source.replace('select("body', 'select(#content')
+    #     display((user, gist_id, source))
 
     @cell_magic
     def d3(self, line, cell):
         src = line if line else "3.5.17"
-        if src[0] == "3":
-            s = """
+        s = """
 <script src="//cdnjs.cloudflare.com/ajax/libs/d3/""" + src + """/d3.js"></script>
 
 <script>
@@ -41,32 +65,12 @@ d3.selectAll""" + str(self.max_id) + """ = function(selection) {
 </script>
 <g id="d3-cell-""" + str(self.max_id) + """">
     """
-        else:
-            s = """"""  # TODO: Implement for D3 v. 4.#.#.
-        # for start_ind, end_ind in [m.span() for m in re.finditer('d3.select\((?!this)', cell)]:
-        #     print(cell[start_ind:end_ind])
-        #     fragment = "d3.select" + str(self.max_id) + "("
-        #     print("Fragment: " + fragment)
-        #     cell = cell[:start_ind] + fragment + cell[end_ind + 1:]
-        # cell = cell.replace("d3.select(", "d3.select" + str(self.max_id) + "(")
-        # cell = cell.replace("d3.selectAll(", "d3.selectAll" + str(self.max_id) + "(")
         cell = re.sub('d3.select\((?!this)', "d3.select" + str(self.max_id) + "(", cell)
         s += cell + "\n</g>"
         print(s)
         h = HTML(s)
         self.max_id += 1
         display(h)
-
-    # @line_cell_magic
-    # def lcmagic(self, line, cell=None):
-    #     "Magic that works both as %lcmagic and as %%lcmagic"
-    #     if cell is None:
-    #         print("Called as line magic")
-    #         return line
-    #     else:
-    #         print("Called as cell magic")
-    #         return line, cell
-
 
 # In order to actually use these magics, you must register them with a
 # running IPython.  This code must be placed in a file that is loaded once
