@@ -7,15 +7,19 @@ The problem this addresses, in brief: Jupyter notebooks allow executing arbitrar
 
 This plugin attempts to improve on a few existing Jupyter-D3 bindings by restricting `d3` scope to whatever cell you are running the code in. It achieves this by monkey-patching subselection over the core `d3.select` and `d3.selectAll` methods. Declare `%%d3` at the beginning of a cell and you're ready to roll!
 
-I also want to implement a `%block` line magic as a [bl.ocks](http://bl.ocks.org/) interface because that'd allow more elegant one-liner chart embedding.
+The verdict thus far: funky, but operational. With a few outstanding quirks, most D3 visualizations, even very complex ones, can be made to run inside of a Jupyter Notebook `%%d3` cell, with a couple of modifications:
 
-The verdict thus far: funky, but operational. More specific notes:
+* Remove any D3 imports in the cell (e.g. `<script src="https://d3js.org/d3.v3.js"></script>`). D3 is initialized at cell runtime by the `%%d3` cell magic (`3.5.11` by default, you can specify a specific version via line parameter, e.g. `%%d3 3.4.3`).
+* Since an HTML document can only have one `<body>` tag, and it's already defined in the Jupyter framing, variants of `d3.select("body").append("g")` won't work. Workaround: define an `<g>` element yourself and then do `d3.select("g")` instead.
 
-* Since an HTML document can only have one `<body>` tag, and it's already defined in the Jupyter framing, variants of `d3.select("body").append("svg")` won't work. Just define an `<svg>` element yourself and then do `d3.select("svg")` instead!
-* Force graphs don't work at all. Unclear why.
-* The visualizations won't load on page load because you won't have the proper D3 CDN localized until you actually run the cell.
+Known issues:
+
+* Force graphs don't work at all. This appears to stem from assumptions the module makes about its runtime environment within D3 code.
+* The visualizations won't load on page load because you won't have the proper D3 CDN localized until you actually run the cell. 
 * D3 cells generated via `Run All` will almost always fail and raise a `Maximum Recursion Error`. I think this is because `%%d3` display cells (implemented via `IPython.display.display`) just initialize the JavaScript code and move on, and don't wait for any necessary D3 libraries to download via CDN. By the time D3 is ready, your notebook might be done running! Running the cells individually, one-by-one, works every time. Usually.
-* Right now I patch all `d3.select` and `d3.selectAll` calls in the entire notebook every time that a new cell is run to target that new cell. This is fine if all `d3` calls have ended by then (e.g. the visualization is static), but will error out or cause undefined behavior if can still be made out of other cells (e.g. the visualization is interactive). I can probably patch this by overwriting on a per-cell basis with a factory method, will give it a shot.
-* This has only been implemented for the 3.0 branch of D3.JS so far, a 4.0 version is coming.
+* For similar reasons, you may sometimes have to run the first `%%d3` cell on the page twice before cells start working properly.
+* Only the 3.x branch version of D3 works. The 4.x version fails for [reasons unknown](http://stackoverflow.com/questions/39335992/d3-4-0-does-not-create-a-global-d3-variable-when-imported-into-jupyter-notebook).
+
+I also want to implement a `%block` line magic as a [bl.ocks](http://bl.ocks.org/) interface because that'd allow more elegant one-liner chart embedding. I haven't finshed it yet because there's lots of little string substitutions that have to be written and tests that have to be run to make sure it works, and I don't feel justified in doing so unless all of the root `%%d3` quirks are worked out.
 
 See [this comment by Mike Bostock](https://github.com/d3/d3/issues/2947) for ideation.
