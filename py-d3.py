@@ -68,7 +68,7 @@ d3.selectAll""" + str(self.max_id) + """ = function(selection) {
     """
         cell = re.sub('d3.select\((?!this)', "d3.select" + str(self.max_id) + "(", cell)
         s += cell + "\n</g>"
-        print(s)
+        # print(s)
         h = HTML(s)
         self.max_id += 1
         display(h)
