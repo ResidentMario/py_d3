@@ -16,7 +16,7 @@ import re
 class D3Magics(Magics):
 
     def __init__(self, **kwargs):
-        super().__init__(**kwargs)
+        super(D3Magics, self).__init__(**kwargs)
         self.max_id = 0  # Used to ensure that the current group selection is unique.
         # self.initialized = True  # Used to ensure that d3.js is only imported once.
 
