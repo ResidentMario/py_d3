@@ -82,10 +82,11 @@ d3.selectAll""" + str(self.max_id) + """ = function(selection) {
         self.max_id += 1
         display(h)
 
-# In order to actually use these magics, you must register them with a
-# running IPython.  This code must be placed in a file that is loaded once
-# IPython is up and running:
-ip = get_ipython()
-# You can register the class itself without instantiating it.  IPython will
-# call the default constructor on it.
-ip.register_magics(D3Magics)
+
+def load_ipython_extension(ipython):
+    ip = ipython
+    # ip = get_ipython()
+    ip.register_magics(D3Magics)
+
+if __name__ == "__main__":
+    load_ipython_extension(get_ipython())

@@ -2,3 +2,7 @@
 .idea/
 .DS_Store
 .blocks/
+__pycache__/
+py_d3.egg-info
+dist/
+MANIFEST
