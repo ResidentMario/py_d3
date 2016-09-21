@@ -36,8 +36,8 @@ class D3Magics(Magics):
     #         source = f.read()
     #     # We need to perform a few substutions to make the figure work within a Jupyter Notebook file.
     #     # 1. <body> tags are not allowed within a D3 notebook (one has already been defined and HTML documents only
-    #     #    allow one <body> and one <head>), but are probably the most common initial selector of all for defining the
-    #     #    initial D3 frame. To fix:
+    #     #    allow one <body> and one <head>), but are probably the most common initial selector of all for defining
+    #     #    the initial D3 frame. To fix:
     #     #    >>> <body>                 -->     <g>
     #     #    >>> d3.select("body")      -->     d3.select("g")
     #     #    >>> <body id="foo">        -->     ???
@@ -50,10 +50,19 @@ class D3Magics(Magics):
 
     @cell_magic
     def d3(self, line, cell):
-        src = line if line else "3.5.17"
+        src = line if len(line) > 0 else "3.5.17"
         s = """
-<script src="//cdnjs.cloudflare.com/ajax/libs/d3/""" + src + """/d3.js"></script>
+<script>
+requirejs.config({
+    paths: {
+        d3: "//cdnjs.cloudflare.com/ajax/libs/d3/""" + src + """/d3"
+    }
+});
 
+require(['d3'], function(d3) {
+    window.d3 = d3;
+});
+</script>
 <script>
 _select = d3.select;
 
@@ -65,10 +74,10 @@ d3.selectAll""" + str(self.max_id) + """ = function(selection) {
 }
 </script>
 <g id="d3-cell-""" + str(self.max_id) + """">
-    """
+"""
         cell = re.sub('d3.select\((?!this)', "d3.select" + str(self.max_id) + "(", cell)
         s += cell + "\n</g>"
-        # print(s)
+        # print(s)  # Useful for debugging.
         h = HTML(s)
         self.max_id += 1
         display(h)
