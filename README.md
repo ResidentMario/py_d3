@@ -37,7 +37,7 @@ For more examples refer to the [examples notebooks](https://github.com/ResidentM
 
 The easiest way to get `py_d3` is to `pip install py_d3` and then run `%load_ext py_d3` in Jupyter Notebook.
 
-![alt text](./figures/import-py_d3-example.png "Logo Title Text 1")
+![alt text](./figures/import-py-d3-example.png "Logo Title Text 1")
 
 ## Porting
 
