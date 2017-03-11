@@ -61,6 +61,7 @@ This plugin attempts to improve on a few existing Jupyter-D3 bindings by restric
 * D3 cells generated via `Run All` may fail. Run the cell individually instead.
 * You probably will have to run the first `%%d3` cell on the page twice.
 * Your version of D3 will be cached. To load a different version, purge your cache.
+* If you have multiple D3 cells in your notebook, make sure that each one starts with the same `%%d3 <VERSION>` magic! See [Issue #4](https://github.com/ResidentMario/py_d3/issues/4).
 
 ## Contributing
 
