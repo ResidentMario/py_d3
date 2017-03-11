@@ -16,7 +16,7 @@ To choose a specific version of D3, append the version number onto the end of th
 
 ![alt text](./figures/bar-chart-example.png "Logo Title Text 1")
 
-Both `3.x` and `4.x` versions of D3 are supported.
+Both `3.x` and `4.x` versions of D3 are supported. Note, however, that you may only run one version of D3 per notebook.
 
 `py_d3` allows you to express even very complex visual ideas within a Jupyter Notebook without much difficulty.
 A [Radial Reingold-Tilford Tree](http://bl.ocks.org/mbostock/4063550), for example:
@@ -54,12 +54,13 @@ Jupyter notebooks allow executing arbitrary JavaScript code using `IPython.displ
 
 This plugin attempts to improve on a few existing Jupyter-D3 bindings by restricting `d3` scope to whatever cell you are running the code in. It achieves this by monkey-patching subselection over the core `d3.select` and `d3.selectAll` methods (see [this comment by Mike Bostock](https://github.com/d3/d3/issues/2947) for ideation).
 
-`py_d3`, though thoroughly capable, has its quirks:
+`py_d3`, though thoroughly capable, has a lot of quirks:
 
-* Force graphs don't work at all. This appears to stem from assumptions the module makes about its runtime environment within D3 code, best as I can tell. You probably want [`ipython-d3networkx`](https://github.com/jdfreder/ipython-d3networkx) instead.
-* The visualizations won't load on page load because you won't have the proper D3 CDN localized until you actually run the cell.
-* D3 cells generated via `Run All` will almost always fail and raise a `Maximum Recursion Error`. I think this is because `%%d3` display cells (implemented via `IPython.display.display`) just initialize the JavaScript code and move on, and don't wait for any necessary D3 libraries to download via CDN. By the time D3 is ready, your notebook might be done running! Running the cells individually, one-by-one, works every time. Usually.
-* For similar reasons, you may sometimes have to run the first `%%d3` cell on the page twice before cells start working properly.
+* Force graphs don't work at all. Use [`ipython-d3networkx`](https://github.com/jdfreder/ipython-d3networkx) instead.
+* You will need to run your cells first before your plots will show up.
+* D3 cells generated via `Run All` may fail. Run the cell individually instead.
+* You probably will have to run the first `%%d3` cell on the page twice.
+* Your version of D3 will be cached. To load a different version, purge your cache.
 
 ## Contributing
 
