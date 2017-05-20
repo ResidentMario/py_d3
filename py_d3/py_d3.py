@@ -76,6 +76,7 @@ d3.selectAll""" + str(self.max_id) + """ = function(selection) {
 <g id="d3-cell-""" + str(self.max_id) + """">
 """
         cell = re.sub('d3.select\((?!this)', "d3.select" + str(self.max_id) + "(", cell)
+        cell = re.sub('d3.selectAll\((?!this)', "d3.selectAll" + str(self.max_id) + "(", cell)
         s += cell + "\n</g>"
         # print(s)  # Useful for debugging.
         h = HTML(s)
