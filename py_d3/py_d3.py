@@ -2,16 +2,26 @@
 # itself to be running already.  It only creates the magics subclass but
 # doesn't instantiate it yet.
 from __future__ import print_function
-from IPython.core.magic import (Magics, magics_class, line_magic,
-                                cell_magic)
+import sys
+from re import search, sub
+from json import loads
+try:
+    from urllib.request import urlopen
+    from urllib.error import HTTPError
+except ImportError:  # Python2
+    from urllib import urlopen
+
+from IPython.core.magic import (
+    Magics,
+    magics_class,
+    line_cell_magic
+)
 from IPython.display import HTML, display
-import re
+
 # import requests
 # import zipfile
 # import io
 
-
-# The class MUST call this class decorator at creation time
 @magics_class
 class D3Magics(Magics):
 
@@ -19,6 +29,38 @@ class D3Magics(Magics):
         super(D3Magics, self).__init__(**kwargs)
         self.max_id = 0  # Used to ensure that the current group selection is unique.
         # self.initialized = True  # Used to ensure that d3.js is only imported once.
+
+        self._cdnjs_api_url = "http://api.cdnjs.com/libraries/d3"
+
+    @property
+    def last_release(self):
+        """Obtain last stable D3 release from cdnjs API.
+        If is not possible, return last hardcoded release.
+        """
+        try:
+            return self._last_release
+        except AttributeError:
+            try:
+                res = urlopen(self._cdnjs_api_url).read()
+                if sys.version_info >= (3,0):
+                    res = res.decode()
+                self._last_release = loads(res)["assets"][0]["version"]
+                return self._last_release
+            except Exception:
+                pass
+        return "4.13.0"
+
+    def show_all_releases(self):
+        """Print all releases hosted at d3 cdnjs page."""
+        try:
+            res = urlopen(self._cdnjs_api_url).read()
+            if sys.version_info >= (3,0):
+                res = res.decode()
+        except Exception as e:
+            pass
+        else:
+            for asset in loads(res)["assets"]:
+                print(asset["version"])
 
     # # The necessary substitutions to get a block working are theoretically possible, but too quirky for the moment
     # to consider.
@@ -48,14 +90,52 @@ class D3Magics(Magics):
     #     print(HTML(source).data)
     #     display(HTML(source))
 
-    @cell_magic
-    def d3(self, line, cell):
-        src = line if len(line) > 0 else "3.5.17"
+    @line_cell_magic
+    def d3(self, line="", cell=None):
+        """D3 line and cell magics. Can be called as several ways:
+
+        --------------------
+        %d3
+        This prints all avaiable releases hosted remotely at
+        https://cdnjs.com/libraries/d3
+        --------------------
+        %%d3
+        This cell loads the last available remote version of D3JS
+        --------------------
+        %%d3 "4.13.0"
+        This cell loads a remote version (call '%d3' for see all available).
+        --------------------
+        %%d3 local="d3.v4.min.js"
+        This cell loads a local file of the library
+        --------------------
+        %%d3 releases
+        Same as line magics, print all available remote releases.
+        --------------------
+        """
+        LOCAL_IMPORT = False
+
+        if line == "":
+            if cell != None:
+                src = self.last_release
+            else:
+                return self.show_all_releases()
+        else:
+            if "releases" in line or "versions" in line:
+                return self.show_all_releases()
+            elif "local" in line:
+                src = search(r'local="(.+)"\s*', line).group(1)
+                LOCAL_IMPORT = True
+            else:
+                src = line
+
+        if not LOCAL_IMPORT:
+            src = "//cdnjs.cloudflare.com/ajax/libs/d3/%s/d3" % src
+
         s = """
 <script>
 requirejs.config({
     paths: {
-        d3: "//cdnjs.cloudflare.com/ajax/libs/d3/""" + src + """/d3"
+        d3: '""" + src + """'
     }
 });
 
@@ -75,10 +155,10 @@ d3.selectAll""" + str(self.max_id) + """ = function(selection) {
 </script>
 <g id="d3-cell-""" + str(self.max_id) + """">
 """
-        cell = re.sub('d3.select\((?!this)', "d3.select" + str(self.max_id) + "(", cell)
-        cell = re.sub('d3.selectAll\((?!this)', "d3.selectAll" + str(self.max_id) + "(", cell)
+        cell = sub('d3.select\((?!this)', "d3.select" + str(self.max_id) + "(", cell)
+        cell = sub('d3.selectAll\((?!this)', "d3.selectAll" + str(self.max_id) + "(", cell)
         s += cell + "\n</g>"
-        # print(s)  # Useful for debugging.
+        #print(s)  # Useful for debugging.
         h = HTML(s)
         self.max_id += 1
         display(h)
