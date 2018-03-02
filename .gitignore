@@ -7,3 +7,4 @@ py_d3.egg-info
 dist/
 build/
 MANIFEST
+notebooks/

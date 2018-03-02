@@ -5,6 +5,7 @@ from __future__ import print_function
 import sys
 from re import search, sub
 from json import loads
+import warnings
 try:
     from urllib.request import urlopen
     from urllib.error import HTTPError
@@ -28,7 +29,9 @@ class D3Magics(Magics):
     def __init__(self, **kwargs):
         super(D3Magics, self).__init__(**kwargs)
         self.max_id = 0  # Used to ensure that the current group selection is unique.
-        # self.initialized = True  # Used to ensure that d3.js is only imported once.
+        self.initialized = None  # Used to ensure that d3.js is only imported once.
+                                 # Attempts to load other version than the imported yet
+                                 # will show a warning and stop the execution.
 
         self._cdnjs_api_url = "http://api.cdnjs.com/libraries/d3"
 
@@ -126,16 +129,27 @@ class D3Magics(Magics):
                 src = search(r'local="(.+)"\s*', line).group(1)
                 LOCAL_IMPORT = True
             else:
-                src = line
+                src = line.strip('"')
 
         if not LOCAL_IMPORT:
             src = "//cdnjs.cloudflare.com/ajax/libs/d3/%s/d3" % src
 
-        s = """
+        if self.initialized != None:
+            if src != self.initialized:
+                msg = "The first source of D3 used in this notebook is %s." % self.initialized \
+                    + " You can't use different versions of D3 library in the" \
+                    + " same Notebook. Please close, reopen the notebook and load" \
+                    + " your desired version at first."
+                print(msg)
+                return
+        else:
+            self.initialized = src            
+
+        s = '''
 <script>
 requirejs.config({
     paths: {
-        d3: '""" + src + """'
+        d3: "''' + src + '''"
     }
 });
 
@@ -146,15 +160,15 @@ require(['d3'], function(d3) {
 <script>
 _select = d3.select;
 
-d3.select""" + str(self.max_id) + """ = function(selection) {
-    return _select("#d3-cell-""" + str(self.max_id) + """").select(selection);
+d3.select''' + str(self.max_id) + ''' = function(selection) {
+    return _select("#d3-cell-''' + str(self.max_id) + '''").select(selection);
 }
-d3.selectAll""" + str(self.max_id) + """ = function(selection) {
-    return _select("#d3-cell-""" + str(self.max_id) + """").selectAll(selection);
+d3.selectAll''' + str(self.max_id) + ''' = function(selection) {
+    return _select("#d3-cell-''' + str(self.max_id) + '''").selectAll(selection);
 }
 </script>
-<g id="d3-cell-""" + str(self.max_id) + """">
-"""
+<g id="d3-cell-''' + str(self.max_id) + '''">
+'''
         cell = sub('d3.select\((?!this)', "d3.select" + str(self.max_id) + "(", cell)
         cell = sub('d3.selectAll\((?!this)', "d3.selectAll" + str(self.max_id) + "(", cell)
         s += cell + "\n</g>"
@@ -164,10 +178,5 @@ d3.selectAll""" + str(self.max_id) + """ = function(selection) {
         display(h)
 
 
-def load_ipython_extension(ipython):
-    ip = ipython
-    # ip = get_ipython()
-    ip.register_magics(D3Magics)
-
 if __name__ == "__main__":
-    load_ipython_extension(get_ipython())
+    get_ipython().register_magics(D3Magics)
