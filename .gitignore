@@ -3,8 +3,9 @@
 .DS_Store
 .blocks/
 __pycache__/
-py_d3.egg-info
+py_d3.egg-info/
 dist/
 build/
-MANIFEST
 notebooks/
+.pytest_cache/
+proof*

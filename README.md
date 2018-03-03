@@ -1,4 +1,6 @@
-## py_d3  [![PyPi version](https://img.shields.io/pypi/v/py_d3.svg)](https://pypi.python.org/pypi/py_d3/) ![t](https://img.shields.io/badge/status-stable-green.svg) [![Binder](https://mybinder.org/badge.svg)](https://mybinder.org/v2/gh/ResidentMario/py_d3/master?filepath=examples)
+# py_d3
+
+[![PyPi version](https://img.shields.io/pypi/v/py_d3.svg)](https://pypi.python.org/pypi/py_d3/) ![t](https://img.shields.io/badge/status-stable-green.svg) [![Binder](https://mybinder.org/badge.svg)](https://mybinder.org/v2/gh/ResidentMario/py_d3/master?filepath=examples)
 
 `py_d3` is an IPython extension which adds D3 support to the Jupyter Notebook environment.
 
@@ -18,7 +20,7 @@ To choose a specific version of D3, append the version number onto the end of th
 
 Both `3.x` and `4.x` versions of D3 are supported. Note, however, that you may only run one version of D3 per notebook so the first version ran it will be used.
 
-> You can load local D3 library files with `%%d3 local="path/to/filename.min.js"`.
+> You can load local libraries also, only insert the path to your file. Actually `py_d3` doesn't support loading d3 additional dependencies.
 
 `py_d3` allows you to express even very complex visual ideas within a Jupyter Notebook without much difficulty.
 A [Radial Reingold-Tilford Tree](http://bl.ocks.org/mbostock/4063550), for example:
@@ -29,7 +31,7 @@ An interactive treemap ([original](http://bl.ocks.org/mbostock/4063582)):
 
 ![alt text](./figures/tree-diagram-example.gif "Logo Title Text 1")
 
-For more examples refer to the [examples notebooks](https://github.com/ResidentMario/py_d3/tree/master/notebooks).
+For more examples refer to the [examples notebooks](https://github.com/ResidentMario/py_d3/tree/master/examples).
 
 ## Installation
 
