@@ -4,7 +4,11 @@
 from __future__ import print_function
 import os
 import sys
-from re import search, sub
+from re import (
+    search,
+    sub,
+    findall
+)
 from json import loads
 from pprint import pprint
 from base64 import b64encode
@@ -20,7 +24,12 @@ from IPython.core.magic import (
     magics_class,
     line_cell_magic
 )
-from IPython.display import HTML, Javascript, display
+from IPython.display import (
+    HTML, 
+    Javascript, 
+    Markdown,
+    display
+)
 from IPython.utils.py3compat import str_to_bytes, bytes_to_str
 from IPython import get_ipython
 
@@ -308,6 +317,9 @@ d3.selectAll''' + str(self.max_id) + ''' = function(selection) {
                 return self.examples(line)
             elif "modules" in line and not "modules=" in line:
                 return pprint(self.modules)
+            elif "doc" in line or "docs" in line:
+                line = line.replace("docs", "").replace("doc", "")
+                return self.doc(line.strip(" ").strip('"').strip("'"))
             else:
                 if "deps=" in line:   # Handle d3 dependencies
                     _deps = search(r'deps=({.+})', line)
@@ -510,6 +522,35 @@ d3.selectAll''' + str(self.max_id) + ''' = function(selection) {
         _html = renderer.render() #self._build_output_code(renderer.render())
         #print(_html)  # Useful for debugging
         self.create_code_cell("%%%%d3\n%s" % _html)
+        
+    def doc(self, line):
+        """Returns D3 API documentation reference or from one
+        module passed as argument."""
+        module = "d3" if line == "" else line
+        document = "API" if line == "" else "README"
+
+        content = GET("https://raw.githubusercontent.com/d3/%s/master/%s.md" \
+                      % (module, document)
+        )
+
+        # Link to documentation in title            
+        repo_readme_url = "https://github.com/d3/%s/blob/master/%s.md" \
+                              % (module, document)
+        readme_title = "D3 API Reference" if line == "" else line
+        content = content.replace(readme_title, 
+                                 "[%s](%s)" % (readme_title, repo_readme_url))
+
+        # Local references replacements
+        output = []
+        for line in content.split("\n"):
+            local_refs = findall(r'(\(#[\w-]+\))', line)
+            if len(local_refs) > 0:
+                for local_ref in local_refs:
+                    line = line.replace(local_ref,
+                                        "(%s%s)" % (repo_readme_url, local_ref[1:-1]))
+            output.append(line)                
+
+        display(Markdown("\n".join(output)))
 
 def load_ipython_extension(ipython):
     ip = ipython

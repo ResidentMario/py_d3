@@ -1,5 +1,4 @@
 .ipynb_checkpoints/
-.idea/
 .DS_Store
 .blocks/
 __pycache__/
@@ -9,3 +8,4 @@ build/
 notebooks/
 .pytest_cache/
 proof*
+tutoriales/
