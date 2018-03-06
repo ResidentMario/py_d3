@@ -524,8 +524,8 @@ d3.selectAll''' + str(self.max_id) + ''' = function(selection) {
         self.create_code_cell("%%%%d3\n%s" % _html)
         
     def doc(self, line):
-        """Returns D3 API documentation reference or from one
-        module passed as argument."""
+        """Returns D3 general API documentation reference or 
+        from one D3 module passed as argument."""
         module = "d3" if line == "" else line
         document = "API" if line == "" else "README"
 
@@ -537,17 +537,25 @@ d3.selectAll''' + str(self.max_id) + ''' = function(selection) {
         repo_readme_url = "https://github.com/d3/%s/blob/master/%s.md" \
                               % (module, document)
         readme_title = "D3 API Reference" if line == "" else line
-        content = content.replace(readme_title, 
+        
+        content = content.splitlines()
+        content[0] = content[0].replace(readme_title, 
                                  "[%s](%s)" % (readme_title, repo_readme_url))
 
         # Local references replacements
         output = []
-        for line in content.split("\n"):
-            local_refs = findall(r'(\(#[\w-]+\))', line)
-            if len(local_refs) > 0:
-                for local_ref in local_refs:
+        for line in content:
+            local_md_refs = findall(r'(\(#[^\s]+\))', line)  # Markdown links
+            if len(local_md_refs) > 0:
+                for local_ref in local_md_refs:
                     line = line.replace(local_ref,
                                         "(%s%s)" % (repo_readme_url, local_ref[1:-1]))
+            local_html_refs = findall(r'("#[^\s]+")', line)  # HTML links
+            if len(local_html_refs) > 0:
+                for local_ref in local_html_refs:
+                    line = line.replace(local_ref,
+                                        '"%s%s"' % (repo_readme_url, local_ref[1:-1]))
+                
             output.append(line)                
 
         display(Markdown("\n".join(output)))
