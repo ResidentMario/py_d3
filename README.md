@@ -1,4 +1,6 @@
-## py_d3  [![PyPi version](https://img.shields.io/pypi/v/py_d3.svg)](https://pypi.python.org/pypi/py_d3/) ![t](https://img.shields.io/badge/status-stable-green.svg)
+# py_d3
+
+[![PyPi version](https://img.shields.io/pypi/v/py_d3.svg)](https://pypi.python.org/pypi/py_d3/) ![t](https://img.shields.io/badge/status-stable-green.svg) [![Binder](https://mybinder.org/badge.svg)](https://mybinder.org/v2/gh/mondeja/py_d3/master?filepath=doc/py_d3_doc-001.ipynb)
 
 `py_d3` is an IPython extension which adds D3 support to the Jupyter Notebook environment.
 
@@ -16,7 +18,9 @@ To choose a specific version of D3, append the version number onto the end of th
 
 ![alt text](./figures/bar-chart-example.png "Logo Title Text 1")
 
-Both `3.x` and `4.x` versions of D3 are supported. Note, however, that you may only run one version of D3 per notebook.
+Both `3.x` and `4.x` versions of D3 are supported. Note, however, that you may only run one version of D3 per notebook so the first version ran it will be used.
+
+> You can load local libraries also, only insert the path to your file. Actually `py_d3` doesn't support loading d3 additional dependencies.
 
 `py_d3` allows you to express even very complex visual ideas within a Jupyter Notebook without much difficulty.
 A [Radial Reingold-Tilford Tree](http://bl.ocks.org/mbostock/4063550), for example:
@@ -27,11 +31,7 @@ An interactive treemap ([original](http://bl.ocks.org/mbostock/4063582)):
 
 ![alt text](./figures/tree-diagram-example.gif "Logo Title Text 1")
 
-Or even the entire [D3 Show Reel](https://bl.ocks.org/mbostock/1256572) animation:
-
-![alt text](./figures/show-reel.gif "Logo Title Text 1")
-
-For more examples refer to the [examples notebooks](https://github.com/ResidentMario/py_d3/tree/master/notebooks).
+For more examples refer to the [examples notebooks](https://github.com/ResidentMario/py_d3/tree/master/examples).
 
 ## Installation
 
@@ -43,7 +43,7 @@ The easiest way to get `py_d3` is to `pip install py_d3` and then run `%load_ext
 
 Most HTML-hosted D3 visualizations, even very complex ones, can be made to run inside of a Jupyter Notebook `%%d3` cell with just two modifications:
 
-* Remove any D3 imports in the cell (e.g. `<script src="https://d3js.org/d3.v3.js"></script>`). D3 is initialized at cell runtime by the `%%d3` cell magic (`3.5.11` by default, you can specify a specific version via line parameter, e.g. `%%d3 3.4.3`).
+* Remove any D3 imports in the cell (e.g. `<script src="https://d3js.org/d3.v3.js"></script>`). D3 is initialized at cell runtime by the `%%d3` cell magic (`4.13.0` by default, you can specify a specific version via line parameter, e.g. `%%d3 3.4.3`).
 * Since an HTML document can only have one `<body>` tag, and it's already defined in the Jupyter framing, variants of `d3.select("body").append("g")` won't work. Workaround: define an `<g>` element yourself and then do `d3.select("g")` instead.
 
 These changes alone were sufficient to import the visualizations presented here and in the examples.
@@ -61,13 +61,12 @@ This plugin attempts to improve on a few existing Jupyter-D3 bindings by restric
 * D3 cells generated via `Run All` may fail. Run the cell individually instead.
 * You probably will have to run the first `%%d3` cell on the page twice.
 * Your version of D3 will be cached. To load a different version, purge your cache.
-* If you have multiple D3 cells in your notebook, make sure that each one starts with the same `%%d3 <VERSION>` magic! See [Issue #4](https://github.com/ResidentMario/py_d3/issues/4).
 
 ## Contributing
 
 The codebase is actually [very simple](https://github.com/ResidentMario/py_d3/blob/master/py_d3/py_d3.py). Pull requests
 welcome!
 
-## Liscense
+## License
 
 MIT.

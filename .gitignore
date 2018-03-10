@@ -1,8 +1,11 @@
 .ipynb_checkpoints/
-.idea/
 .DS_Store
 .blocks/
 __pycache__/
-py_d3.egg-info
+py_d3.egg-info/
 dist/
-MANIFEST
+build/
+notebooks/
+.pytest_cache/
+proof*
+tutoriales/
