@@ -25,8 +25,8 @@ from IPython.core.magic import (
     line_cell_magic
 )
 from IPython.display import (
-    HTML, 
-    Javascript, 
+    HTML,
+    Javascript,
     Markdown,
     display
 )
@@ -80,7 +80,7 @@ class Renderer:
         # Sustitutions
         content = source_file["content"].replace('<body>', '<g id="body">')
         content = content.replace('("body', '("#body')
-        print("\n---------------\n", content)   # Useful for debugging
+        # print("\n---------------\n", content)   # Useful for debugging
 
         response = []
         match_map = {
@@ -206,7 +206,7 @@ d3.selectAll''' + str(self.max_id) + ''' = function(selection) {
 </script>
 
 <g id="d3-cell-''' + str(self.max_id) + '''">
-'''
+        '''
         cell = sub('d3.select\((?!this)', "d3.select" + str(self.max_id) + "(", cell)
         cell = sub('d3.selectAll\((?!this)', "d3.selectAll" + str(self.max_id) + "(", cell)
         return code_template + cell + "\n</g>"
@@ -261,7 +261,7 @@ d3.selectAll''' + str(self.max_id) + ''' = function(selection) {
 
     @property
     def version(self):
-        """Returns version actually in use in the page."""
+        """Returns version actually in use in the current notebook."""
         if not self.src:
             return self.last_release
         else:
@@ -317,6 +317,11 @@ d3.selectAll''' + str(self.max_id) + ''' = function(selection) {
                 return self.examples(line)
             elif "modules" in line and not "modules=" in line:
                 return pprint(self.modules)
+            elif "gist" in line:
+                renderer = Renderer(self.gist(line.replace("gist ", "").strip('"')))
+                _html = renderer.render()
+                self.create_code_cell("%%%%d3\n%s" % _html)
+                return
             elif "doc" in line or "docs" in line:
                 line = line.replace("docs", "").replace("doc", "")
                 return self.doc(line.strip(" ").strip('"').strip("'"))
@@ -330,7 +335,7 @@ d3.selectAll''' + str(self.max_id) + ''' = function(selection) {
                 lineargs = line.split(" ")
                 if lineargs[0] not in ["generator", ""]: # "generator" is not first param
                     line = line.strip('"')    # so is the source
-                    if os.path.exists(line): # Local load
+                    if os.path.exists(line): # Local loading
                         LOCAL_IMPORT = True
                     else:
                         if line not in self.online_releases:
@@ -413,9 +418,9 @@ d3.selectAll''' + str(self.max_id) + ''' = function(selection) {
                 "thumbnail": "http://gist.githubusercontent.com/%s/%s/raw/thumbnail.png" % (user, _id),
             }
             if generator:
-                _block["source"] = "https://api.github.com/gists/%s" % _id
+                _block["source"] = _id
             blocks.append(_block)
-        if generator:
+        if generator:   # Store examples in cache if is called from self.generator method
             self._examples_cache = blocks
 
         def _render_row(data):
@@ -426,14 +431,13 @@ d3.selectAll''' + str(self.max_id) + ''' = function(selection) {
                 data["description"] = ""
             return '<td><a target="_blank" href="%s">%s</a></td>' % (data["online_view"], data["description"]) \
                    + '<td><img src="%s" width="70px" height="25px" alt=" "></d>' % data["thumbnail"] \
-                   + '<td><a href="%s">%s</a></td>' % ("http://github.com/" + data["user"], data["user"]) \
-                   + '<td><a button'
+                   + '<td><a href="%s">%s</a></td>' % ("http://github.com/" + data["user"], data["user"])
 
         _title = "<h3>D3 v%s online examples</h3>" % args["version"]
-        _table = "\n".join(["<tr>%s</tr>" % _render_row(block) for block in blocks])
+        _table_body = "\n".join(["<tr>%s</tr>" % _render_row(block) for block in blocks])
 
         _html = _title + '<table style="width:100%"><tr><th>Name</th>' \
-              + '<th>Thumbnail</th><th>User</th></tr>''' + _table + '''</table>'''
+              + '<th>Thumbnail</th><th>User</th></tr>''' + _table_body + '''</table>'''
 
         if USE_IPYWIDGETS:
             return widgets.HTML(value= _html)
@@ -465,7 +469,7 @@ d3.selectAll''' + str(self.max_id) + ''' = function(selection) {
             icon='code',
             layout=widgets.Layout(width='20%')
         )
-        input_example_button.on_click(self._renderer)
+        input_example_button.on_click(self._generator_renderer)
         _input_example_tab = [
             self._generator_text_input,
             input_example_button
@@ -482,13 +486,15 @@ d3.selectAll''' + str(self.max_id) + ''' = function(selection) {
             gui.set_title(i, name)
         return gui
 
-    def load_github_gist(self, url,
-                          valid_extensions=[".js", ".html", ".csv", ".json", ".svg"]):
+    def gist(self, _id, valid_extensions=[".js", ".html", ".csv", ".json", ".svg"]):
         """Load a github gist and returns all files with their content.
-        Only returns that files with an extension provided by the parameter
-        ``valid_extensions``.
+
+        Args:
+            _id (str): Gist id.
+            valid_extensions (list, optional): Only files with an extension
+                provider in this parameter will be loaded.
         """
-        res = GET(url)
+        res = GET("https://api.github.com/gists/%s" % _id)
         _files = []
         for filename, filedata in loads(res)["files"].items():
             # print(filename)     # Useful for debugging
@@ -501,9 +507,9 @@ d3.selectAll''' + str(self.max_id) + ''' = function(selection) {
                     break
         return _files
 
-    def _renderer(self, trigger):
+    def _generator_renderer(self, trigger):
         """Internal method for render a example name from the examples list.
-        This method is called as callback from self.generator
+        This method is called as button callback from self.generator
         """
         example_name = self._generator_text_input.value
         block_found = False
@@ -515,16 +521,14 @@ d3.selectAll''' + str(self.max_id) + ''' = function(selection) {
         if not block_found:    # Handle bad requests
             raise ValueError("Example %s not founded." % example_name)
 
-        #self._examples_cache = None  # Clean cache  TODO: Add argument cache=False
-
-        _files = self.load_github_gist(block["source"])
+        _files = self.gist(block["source"])
         renderer = Renderer(_files)
-        _html = renderer.render() #self._build_output_code(renderer.render())
+        _html = renderer.render()
         #print(_html)  # Useful for debugging
         self.create_code_cell("%%%%d3\n%s" % _html)
-        
+
     def doc(self, line):
-        """Returns D3 general API documentation reference or 
+        """Returns D3 general API documentation reference or
         from one D3 module passed as argument."""
         module = "d3" if line == "" else line
         document = "API" if line == "" else "README"
@@ -533,14 +537,14 @@ d3.selectAll''' + str(self.max_id) + ''' = function(selection) {
                       % (module, document)
         )
 
-        # Link to documentation in title            
+        # Link to documentation in title
         repo_readme_url = "https://github.com/d3/%s/blob/master/%s.md" \
                               % (module, document)
         readme_title = "D3 API Reference" if line == "" else line
-        
+
         content = content.splitlines()
-        content[0] = content[0].replace(readme_title, 
-                                 "[%s](%s)" % (readme_title, repo_readme_url))
+        content[0] = content[0].replace(readme_title,
+                                        "[%s](%s)" % (readme_title, repo_readme_url))
 
         # Local references replacements
         output = []
@@ -555,8 +559,8 @@ d3.selectAll''' + str(self.max_id) + ''' = function(selection) {
                 for local_ref in local_html_refs:
                     line = line.replace(local_ref,
                                         '"%s%s"' % (repo_readme_url, local_ref[1:-1]))
-                
-            output.append(line)                
+
+            output.append(line)
 
         display(Markdown("\n".join(output)))
 

@@ -1,6 +1,6 @@
 # py_d3
 
-[![PyPi version](https://img.shields.io/pypi/v/py_d3.svg)](https://pypi.python.org/pypi/py_d3/) ![t](https://img.shields.io/badge/status-stable-green.svg) [![Binder](https://mybinder.org/badge.svg)](https://mybinder.org/v2/gh/ResidentMario/py_d3/master?filepath=examples)
+[![PyPi version](https://img.shields.io/pypi/v/py_d3.svg)](https://pypi.python.org/pypi/py_d3/) ![t](https://img.shields.io/badge/status-stable-green.svg) [![Binder](https://mybinder.org/badge.svg)](https://mybinder.org/v2/gh/mondeja/py_d3/master?filepath=doc/py_d3_doc-001.ipynb)
 
 `py_d3` is an IPython extension which adds D3 support to the Jupyter Notebook environment.
 

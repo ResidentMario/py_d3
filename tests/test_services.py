@@ -14,3 +14,8 @@ def test_cdnjs_api():
 
 def test_blockbuilder_api():
     assert service_up(d3magics._blockbuilder_api_url)
+
+@test_end2end
+def test_d3_documentation():
+    doc_output = d3magics.doc(line="") # Main API reference
+
