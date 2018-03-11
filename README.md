@@ -2,21 +2,18 @@
 
 `py_d3` is an IPython extension which adds D3 support to the Jupyter Notebook environment.
 
-D3 is a well-known and -loved JavaScript data visualization and document object manipulation library which makes it possible to express even extremely complex visual ideas simply using an intuitive grammar. Jupyter is a browser-hosted Python executable environment which provides an intuitive data science interface.
-
-These libraries are foundational cornerstones of web-based data visualization and web-based data science, respectively.  Wouldn't it be great if we could them to work together? This module does just that.
-
+D3 is a powerful JavaScript data visualization library, while Jupyter is an intuitive browser-hosted Python 
+development environment. Wouldn't it be great if you could use them together? Now you can.
+ 
 ## Quickstart
 
-To create a D3 block in your notebook, add the `%%d3` cell magic to the top of the cell:
+You can install `py_d3` by running `pip install py_d3`. Then load it into a Jupyter notebook by 
+running`%load_ext py_d3`.
 
-![alt text](./figures/hello-world-example.png "Logo Title Text 1")
+Use the `%%d3` [cell magic](http://ipython.readthedocs.io/en/stable/config/extensions/index.html#ipython-extensions) 
+to define notebook cells with D3 content.
 
-To choose a specific version of D3, append the version number onto the end of the line:
-
-![alt text](./figures/bar-chart-example.png "Logo Title Text 1")
-
-Both `3.x` and `4.x` versions of D3 are supported. Note, however, that you may only run one version of D3 per notebook.
+![alt text](./figures/import-py-d3-example.png "Logo Title Text 1")
 
 `py_d3` allows you to express even very complex visual ideas within a Jupyter Notebook without much difficulty.
 A [Radial Reingold-Tilford Tree](http://bl.ocks.org/mbostock/4063550), for example:
@@ -33,41 +30,41 @@ Or even the entire [D3 Show Reel](https://bl.ocks.org/mbostock/1256572) animatio
 
 For more examples refer to the [examples notebooks](https://github.com/ResidentMario/py_d3/tree/master/notebooks).
 
-## Installation
+## Features
 
-The easiest way to get `py_d3` is to `pip install py_d3` and then run `%load_ext py_d3` in Jupyter Notebook.
+### Configuration
 
-![alt text](./figures/import-py-d3-example.png "Logo Title Text 1")
+The cell magic will default to loading the latest stable version of D3.JS available online (via 
+[CDNJS](https://cdnjs.com/about); `d3@4.13.0` at time of writing). To load a specific version, append the version 
+name to the command, e.g. `%%d3 "3.5.17"`. To load D3.JS from a local file pass the filepath, e.g. 
+`%%d3 "d3.v5.min.js"`.
 
-## Porting
+Only one version of D3.JS may be loaded at a time. Both `3.x` and `4.x` versions of D3 are supported, but you may 
+only run one version of D3 per notebook. You can check which versions are available by running `%d3 versions`, and check which version 
+is loaded in the *current* notebook using `%d3 version`. 
+
+### Documentation
+
+Pages from the [D3 API Reference](https://github.com/d3/d3/blob/master/API.md) may be rendered in-notebook using 
+`%d3 doc`. For example, you can render the `d3-array` reference by running `%d3 doc "d3-array"`.
+
+
+## Technical
+
+### How it works
+
+Jupyter notebooks allow executing arbitrary JavaScript code using `IPython.display.JavaScript`, however it makes no 
+effort to restrict the level of DOM objects accessible to executable code. `py_d3` works by restricting `d3` scope to
+whatever cell you are running the code in, by monkey-patching the `d3.select` and `d3.selectAll` methods (see 
+[here](https://github.com/d3/d3/issues/2947) for why this works).
+
+### Porting
 
 Most HTML-hosted D3 visualizations, even very complex ones, can be made to run inside of a Jupyter Notebook `%%d3` cell with just two modifications:
 
-* Remove any D3 imports in the cell (e.g. `<script src="https://d3js.org/d3.v3.js"></script>`). D3 is initialized at cell runtime by the `%%d3` cell magic (`3.5.11` by default, you can specify a specific version via line parameter, e.g. `%%d3 3.4.3`).
-* Since an HTML document can only have one `<body>` tag, and it's already defined in the Jupyter framing, variants of `d3.select("body").append("g")` won't work. Workaround: define an `<g>` element yourself and then do `d3.select("g")` instead.
+* Remove any D3 imports in the cell (e.g. `<script src="https://d3js.org/d3.v3.js"></script>`).
+* Make sure to create and append to a legal HTML document sub-element. `d3.select("body").append("g")` won't work.
 
-These changes alone were sufficient to import the visualizations presented here and in the examples.
+### Contributing
 
-## Technicals
-
-Jupyter notebooks allow executing arbitrary JavaScript code using `IPython.display.JavaScript`, however it makes no effort to restrict the level of DOM objects accessible to executable code. Thus if you ran, for instance, `%javascript d3.selectAll("div").remove();`, you would target and remove *all* `div` elements on the page, including the ones making up the notebook itself!
-
-This plugin attempts to improve on a few existing Jupyter-D3 bindings by restricting `d3` scope to whatever cell you are running the code in. It achieves this by monkey-patching subselection over the core `d3.select` and `d3.selectAll` methods (see [this comment by Mike Bostock](https://github.com/d3/d3/issues/2947) for ideation).
-
-`py_d3`, though thoroughly capable, has a lot of quirks:
-
-* Force graphs don't work at all. Use [`ipython-d3networkx`](https://github.com/jdfreder/ipython-d3networkx) instead.
-* You will need to run your cells first before your plots will show up.
-* D3 cells generated via `Run All` may fail. Run the cell individually instead.
-* You probably will have to run the first `%%d3` cell on the page twice.
-* Your version of D3 will be cached. To load a different version, purge your cache.
-* If you have multiple D3 cells in your notebook, make sure that each one starts with the same `%%d3 <VERSION>` magic! See [Issue #4](https://github.com/ResidentMario/py_d3/issues/4).
-
-## Contributing
-
-The codebase is actually [very simple](https://github.com/ResidentMario/py_d3/blob/master/py_d3/py_d3.py). Pull requests
-welcome!
-
-## Liscense
-
-MIT.
+See `CONTRIBUTING.md` for instructions on how to contribute. Pull requests are welcome!
