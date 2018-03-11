@@ -48,6 +48,9 @@ is loaded in the *current* notebook using `%d3 version`.
 Pages from the [D3 API Reference](https://github.com/d3/d3/blob/master/API.md) may be rendered in-notebook using 
 `%d3 doc`. For example, you can render the `d3-array` reference by running `%d3 doc "d3-array"`.
 
+### Verbose Mode
+
+You can view code to-be-rendered using verbose mode: `%d3 -v`. This is helpful for debugging your application.
 
 ## Technical
 
