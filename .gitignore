@@ -2,6 +2,7 @@
 .idea/
 .DS_Store
 .blocks/
+.pytest_cache/
 __pycache__/
 py_d3.egg-info
 dist/

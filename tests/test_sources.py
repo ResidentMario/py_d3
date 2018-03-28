@@ -9,12 +9,14 @@ from py_d3 import D3Magics
 cell_content = "<g></g>"
 kwargs = dict(cell=cell_content)
 local_fake_d3_library_path = os.path.join(os.path.dirname(__file__),
-	                                      "fake_d3_library_v500.min.js")
+                                          "fake_d3_library_v500.min.js")
+
 
 def asserted_instance_init():
     d3magics = D3Magics()
-    assert d3magics.src == None
+    assert d3magics.src is None
     return d3magics
+
 
 def test_explicit_init_source():
     d3magics = asserted_instance_init()
@@ -24,12 +26,14 @@ def test_explicit_init_source():
     assert d3magics.version == version
     assert d3magics.src == d3magics._cdnjs_d3_source_template % d3magics.version
 
+
 def test_implicit_init_source():
     d3magics = asserted_instance_init()
 
     d3magics.d3(**kwargs)
     assert d3magics.version == d3magics.last_release
     assert d3magics.src == d3magics._cdnjs_d3_source_template % d3magics.version
+
 
 def test_invalid_init_source():
     d3magics = asserted_instance_init()

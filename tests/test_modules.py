@@ -11,9 +11,11 @@ all_modules = d3magics.modules
 
 f = io.StringIO()  # Buffer to save stdout
 
+
 def test_modules_list():
     assert isinstance(all_modules, list)
     assert len(all_modules) > 0
+
 
 def assert_stdout(f):
     _mods = eval(

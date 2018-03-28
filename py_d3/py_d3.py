@@ -13,7 +13,6 @@ from json import loads
 from pprint import pprint
 try:
     from urllib.request import urlopen
-    from urllib.error import HTTPError
 except ImportError:  # Python2
     from urllib import urlopen
 
@@ -24,7 +23,6 @@ from IPython.core.magic import (
 )
 from IPython.display import (
     HTML,
-    Javascript,
     Markdown,
     display
 )
@@ -42,6 +40,7 @@ def GET(url):
         raise e
     else:
         return res
+
 
 @magics_class
 class D3Magics(Magics):
@@ -266,6 +265,7 @@ d3.selectAll''' + str(self.max_id) + ''' = function(selection) {
 def load_ipython_extension(ipython):
     ip = ipython
     ip.register_magics(D3Magics)
+
 
 if __name__ == "__main__":
     load_ipython_extension(get_ipython())
