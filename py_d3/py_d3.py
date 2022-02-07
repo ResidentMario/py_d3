@@ -115,7 +115,7 @@ d3.selectAll''' + str(self.max_id) + ''' = function(selection) {
                 res = urlopen(self._cdnjs_api_url).read()
                 if sys.version_info >= (3,0):
                     res = res.decode()
-                self._last_release = loads(res)["assets"][0]["version"]
+                self._last_release = loads(res)["version"]
                 return self._last_release
             except Exception:
                 pass
