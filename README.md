@@ -1,10 +1,24 @@
-## py_d3  [![PyPi version](https://img.shields.io/pypi/v/py_d3.svg)](https://pypi.python.org/pypi/py_d3/) ![t](https://img.shields.io/badge/status-stable-green.svg)
+# py_d3  [![PyPi version](https://img.shields.io/pypi/v/py_d3.svg)](https://pypi.python.org/pypi/py_d3/) ![t](https://img.shields.io/badge/status-unmaintained-red.svg)
+
+## Deprecation notice
+
+The `py_d3` package has been retired. This package was only ever intended to work in the classical Jupyter Notebook environment, this has been replaced pretty much all applications by the more advanced and more feature-complete Jupyter Lab. Jupyter Lab has a completely different SDK for notebook extensions, which this package neither uses nor supports.
+
+As such this package is now unmaintained.
+
+For users looking for an interactive environment for building D3.JS visualizations in, I recommend [Observable Notebooks](https://observablehq.com/explore).
+
+For users looking to embed D3.JS visualizations in their Jupyter Lab notebooks, [check out this Gist](https://gist.github.com/gnestor/f1893e0226ced227e910f11b769adc06).
+
+Happy plotting!
+
+## About
 
 `py_d3` is an IPython extension which adds D3 support to the Jupyter Notebook environment.
 
 D3 is a powerful JavaScript data visualization library, while Jupyter is an intuitive browser-hosted Python 
 development environment. Wouldn't it be great if you could use them together? Now you can.
- 
+
 ## Quickstart
 
 You can install `py_d3` by running `pip install py_d3`. Then load it into a Jupyter notebook by 
@@ -70,4 +84,4 @@ Most HTML-hosted D3 visualizations, even very complex ones, can be made to run i
 
 ### Contributing
 
-See `CONTRIBUTING.md` for instructions on how to contribute. Pull requests are welcome!
+See `CONTRIBUTING.md` for instructions on how to contribute.
